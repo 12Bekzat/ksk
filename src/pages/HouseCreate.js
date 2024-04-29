@@ -9,8 +9,10 @@ const HouseCreate = () => {
     const [square, setSquare] = useState(0);
     const [count, setCount] = useState(0);
     const [jkhId, setJkhId] = useState(-1);
+    const [employeeId, setEmployeeId] = useState(-1);
     const [allJkh, setAllJkh] = useState([]);
-    const { getAllJkh, addHouse, getHouseById, editHouse } = useMainService();
+    const [myJkh, setMyJkh] = useState(null);
+    const { getAllJkh, addHouse, addHouseToJkh, getHouseById, editHouse, getUserJkh, getUserInfo } = useMainService();
     const { role } = useContext(AuthContext);
     const navigate = useNavigate();
     const { setData } = useContext(PopupContext);
@@ -28,10 +30,33 @@ const HouseCreate = () => {
             .catch(err => console.log(err));
     }
 
+    const handleMyJkhLoad = () => {
+        getUserJkh(employeeId)
+            .then(data => {
+                setMyJkh(data);
+                setJkhId(data.id);
+            })
+            .catch(err => console.log(err));
+    }
+
     useEffect(() => {
         if (role.filter(item => item.name == "ROLE_ADMIN").length > 0)
             handleAllJkhLoad();
+
+        if (role.filter(item => item.name == "ROLE_KSK").length > 0) {
+            getUserInfo()
+                .then(data => {
+                    setEmployeeId(data.id);
+                })
+                .catch(err => console.log(err));
+        }
     }, [role])
+
+    useEffect(() => {
+        if (employeeId != -1) {
+            handleMyJkhLoad();
+        }
+    }, [employeeId]);
 
     const create = () => {
         if (address == '' ||
@@ -42,15 +67,17 @@ const HouseCreate = () => {
             return;
         }
 
-
-
         const house = {
             address, square, countOfPeople: count, jkhId
         }
 
         addHouse(id, house)
             .then(data => {
-                navigate("/profile")
+                addHouseToJkh(id, jkhId)
+                    .then(data => {
+                        navigate("/profile")
+                    })
+                    .catch(err => console.log(err));
             })
             .catch(err => console.log(err));
 
@@ -97,10 +124,15 @@ const HouseCreate = () => {
                     </label>
                 </div>
                 <div className="login__input">
-                    <select onChange={e => setJkhId(e.target.value)} value={jkhId}>
+                    {role.filter(item => item.name == "ROLE_ADMIN").length > 0 ? <select onChange={e => setJkhId(e.target.value)} value={jkhId}>
                         {allJkh.map(item =>
                             (<option value={item.id} key={item.id}>{item.name}</option>))}
-                    </select>
+                    </select> : null}
+                    {role.filter(item => item.name == "ROLE_KSK").length > 0 && myJkh ? <input autoComplete='off'
+                        className={'focus'}
+                        disabled={true}
+                        type="text"
+                        value={myJkh.name} /> : null}
                     <label>ЖКХ</label>
                 </div>
                 <div className="login__button" onClick={create}>Сохранить</div>

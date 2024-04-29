@@ -93,17 +93,210 @@ const Profile = () => {
             {role.filter(item => item.name === "ROLE_ADMIN").length !== 0 ?
                 <AdminTag active={active} setActive={setActive} role={role} /> : null
             }
+
+            {role.filter(item => item.name === "ROLE_KSK").length !== 0 ?
+                <EmployeeTag active={active} setActive={setActive} role={role} id={myInfo.id} /> : null
+            }
         </div>
     );
 };
 
-const AdminTag = ({ active, setActive, role }) => {
+const EmployeeTag = ({ active, setActive, role, id }) => {
+    const [users, setUsers] = useState([]);
+    const [news, setNews] = useState([]);
+    const [search, setSearch] = useState('');
+    const [myJkh, setMyJkh] = useState({});
+    const { getNews, getUsers, getUserJkh } = useMainService();
+
+    useEffect(() => {
+        handleNewsLoad();
+        handleUserLoad();
+        handleMyJkhLoad();
+    }, [role, id]);
+
+    const handleSearch = (searchTerm) => {
+        const results = users.map(item =>
+            item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ? { ...item, show: true } : { ...item, show: false }
+        );
+
+        setUsers(results);
+    };
+
+    function sortUsersByFullName() {
+        let array = [...users].sort((a, b) => {
+            if (a.fullName < b.fullName) {
+                return -1;
+            }
+            if (a.fullName > b.fullName) {
+                return 1;
+            }
+            return 0;
+        });
+
+        setUsers(array);
+    }
+
+    function sortUsersByFullNameReverse() {
+        let array = [...users].sort((a, b) => {
+            if (a.fullName > b.fullName) {
+                return -1;
+            }
+            if (a.fullName < b.fullName) {
+                return 1;
+            }
+            return 0;
+        })
+
+        setUsers(array);
+    }
+
+    const handleNewsLoad = () => {
+        getNews()
+            .then(data => {
+                setNews(data);
+            })
+            .catch(err => console.log(err));
+    }
+
+    const handleUserLoad = () => {
+        getUsers()
+            .then(data => {
+                setUsers(data.map(item => ({ ...item, show: true })));
+            })
+            .catch(err => console.log(err));
+    }
+
+    const handleMyJkhLoad = () => {
+        if (id)
+            getUserJkh(id)
+                .then(data => {
+                    setMyJkh(data);
+                })
+                .catch(err => console.log(err));
+    }
+
+    const newsInfo = useMemo(() => {
+        return news.map(item => (
+            <NewsItem
+                key={item.id}
+                admin={true}
+                onDelete={() => {
+                    handleNewsLoad()
+                }}
+                id={item.id}
+                title={item.title}
+                text={item.text}
+                date={item.date} />
+        ))
+    }, [news]);
+
+    const usersInfo = useMemo(() => (
+        users.map(item => (
+            item.show ? <UsersItem
+                key={item.id}
+                banned={item.banned}
+                home={item.home}
+                onDelete={
+                    handleUserLoad
+                }
+                fullName={item.fullName}
+                username={item.username}
+                id={item.id} /> : null
+        ))
+    ), [users]);
+
+    const jkhInfo = useMemo(() => (
+        <JkhItem
+            name={myJkh.name}
+            id={myJkh.id} />
+
+    ), [myJkh]);
+
+    return (
+        <div className="orders">
+            <div className="orders__header">
+                <div
+                    className={"orders__top" + (active === 0 ? ' active' : '')}
+                    onClick={() => { setActive(0) }}>
+                    Новости
+                </div>
+                <div
+                    className={"orders__top" + (active === 1 ? ' active' : '')}
+                    onClick={() => { setActive(1) }}>
+                    Пользователи
+                </div>
+                <div
+                    className={"orders__top" + (active === 2 ? ' active' : '')}
+                    onClick={() => { setActive(2) }}>
+                    Жкх
+                </div>
+            </div>
+
+            <div className="orders__body">
+                <div className={"orders__container" + (active === 0 ? ' active' : '')}>
+                    <div className="orders__filter">
+                        <Link to={"/news"} className="orders__button">
+                            <i className="fa-solid fa-file-circle-plus"></i>
+                        </Link>
+                    </div>
+                    <div className="news">
+                        {newsInfo}
+                    </div>
+                </div>
+                <div className={"orders__container" + (active === 1 ? ' active' : '')}>
+                    <div className="orders__filter">
+                        <div className="orders__input">
+                            <input
+                                autoComplete='off'
+                                className={search !== '' ? 'focus' : ''}
+                                type="text"
+                                id='search'
+                                value={search}
+                                onChange={e => {
+                                    handleSearch(e.target.value)
+                                    setSearch(e.target.value)
+                                }} />
+                            <label htmlFor="search">
+                                Поиск
+                            </label>
+                        </div>
+                        <Link to={"/user/create"} className="orders__button">
+                            <i className="fa-solid fa-user-plus"></i>
+                        </Link>
+                        <div className="orders__button" onClick={() => { sortUsersByFullName() }}>
+                            <i className="fa-solid fa-arrow-up-a-z"></i>
+                        </div>
+                        <div className="orders__button" onClick={() => { sortUsersByFullNameReverse() }}>
+                            <i className="fa-solid fa-arrow-down-z-a"></i>
+                        </div>
+                    </div>
+                    <div className="users">
+                        {usersInfo}
+                    </div>
+                </div>
+                <div className={"orders__container" + (active === 2 ? ' active' : '')}>
+                    <div className="orders__filter">
+                        <Link to={"/jkh"} className="orders__button">
+                            <i className="fa-solid fa-building-circle-arrow-right"></i>
+                        </Link>
+                    </div>
+                    <div className="jkh">
+                        {jkhInfo}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const AdminTag = ({ active, setActive, role, userId }) => {
     const [users, setUsers] = useState([]);
     const [allJkh, setAllJkh] = useState([]);
+    const [myJkh, setMyJkh] = useState({});
     const [news, setNews] = useState([]);
     const [rates, setRates] = useState([]);
     const [search, setSearch] = useState('');
-    const { getUsers, getNews, getAllJkh, getRates } = useMainService();
+    const { getUsers, getNews, getAllJkh, getRates, getUserJkh } = useMainService();
 
     useEffect(() => {
         if (role.filter(item => item.name === "ROLE_ADMIN").length !== 0) {
@@ -111,8 +304,22 @@ const AdminTag = ({ active, setActive, role }) => {
             handleJkhLoad();
             handleNewsLoad();
             handleRateLoad();
+        } else if (role.filter(item => item.name === "ROLE_KSK").length !== 0) {
+            handleUserLoad();
+            handleNewsLoad();
+            handleRateLoad();
+            handleMyJkhLoad();
         }
+
     }, [role]);
+
+    const handleMyJkhLoad = () => {
+        getUserJkh(userId)
+            .then(data => {
+                setMyJkh(data);
+            })
+            .catch(err => console.log(err));
+    }
 
     const handleRateLoad = () => {
         getRates()
@@ -246,11 +453,6 @@ const AdminTag = ({ active, setActive, role }) => {
                     Новости
                 </div>
                 <div
-                    className={"orders__top" + (active === 1 ? ' active' : '')}
-                    onClick={() => { setActive(1) }}>
-                    Услуги
-                </div>
-                <div
                     className={"orders__top" + (active === 2 ? ' active' : '')}
                     onClick={() => { setActive(2) }}>
                     Пользователи
@@ -277,9 +479,6 @@ const AdminTag = ({ active, setActive, role }) => {
                     <div className="news">
                         {newsInfo}
                     </div>
-                </div>
-                <div className={"orders__container" + (active === 1 ? ' active' : '')}>
-
                 </div>
                 <div className={"orders__container" + (active === 2 ? ' active' : '')}>
                     <div className="orders__filter">

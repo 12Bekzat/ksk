@@ -179,6 +179,13 @@ const useMainService = () => {
         return null;
     }
 
+    const addHouseToJkh = async (id, jkhId) => { // id, {address, square, count of people, jkhId}
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/users/${id}/add/house/jkh/${jkhId}`, 'POST', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
     const getUserHouse = async (userId) => { // id, {address, square, count of people, jkhId}
         const token = getLocalStorageWithExpiry('token');
         if (token)
@@ -249,7 +256,49 @@ const useMainService = () => {
         return null;
     }
 
-    return { auth, getUserInfo, getRoles, getNews, createNews, removeNews, editNews, setLogo, getLogo, setUserData, getUsers, getNewsById, register, getUserInfoById, setBanUser, setUnbanUser, removeUser, getAllJkh, getJkhById, createJkh, addEmployeeJkh, removeEmployeeJkh, getAllEmployee, addHouse, editHouse, getRates, getRateById, createRate, removeRate, editRate, getUserHouse, removeHouse, getHouseById, removeClient, loading, error };
+    const createPayment = async (jkhId, userId, payment) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/payment/send/${jkhId}/${userId}`, 'POST', JSON.stringify(payment), { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    const getUserPayments = async (userId) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/users/${userId}/payments`, 'GET', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    const getUserPaymentsExpired = async (userId) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/users/${userId}/payments/expired`, 'POST', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    const getJkhPayments = async (userId) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/jkh/${userId}/payments`, 'GET', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    const payPayment = async (id) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/payment/${id}/pay`, 'POST', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    const getUserJkh = async (id) => {
+        const token = getLocalStorageWithExpiry('token');
+        if (token)
+            return await request(`${_apiBase}/users/${id}/jkh`, 'GET', null, { "Content-Type": 'application/json', "Authorization": `Bearer ${token.replace('"', '')}` });
+        return null;
+    }
+
+    return { auth, getUserInfo, getRoles, getNews, createNews, removeNews, editNews, setLogo, getLogo, setUserData, getUsers, getNewsById, register, getUserInfoById, setBanUser, setUnbanUser, removeUser, getAllJkh, getJkhById, createJkh, addEmployeeJkh, removeEmployeeJkh, getAllEmployee, addHouse, editHouse, getRates, getRateById, createRate, removeRate, editRate, getUserHouse, removeHouse, getHouseById, removeClient, createPayment, getUserPayments, getJkhPayments, getUserPaymentsExpired, payPayment, getUserJkh, addHouseToJkh, loading, error };
 }
 
 export default useMainService;

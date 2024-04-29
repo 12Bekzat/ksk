@@ -32,6 +32,56 @@ body {
   align-items: center;
 }
 
+.loader {
+  width: 100%;
+  height: 100%;
+  background: #212327;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader .lds-facebook,
+.loader .lds-facebook div {
+  box-sizing: border-box;
+}
+.loader .lds-facebook {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.loader .lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: currentColor;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  background: #3bff5a;
+}
+.loader .lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+.loader .lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+.loader .lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0s;
+}
+
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px;
+  }
+  50%, 100% {
+    top: 24px;
+    height: 32px;
+  }
+}
 .popup {
   display: flex;
   flex-direction: column;
@@ -373,6 +423,28 @@ body {
   align-items: center;
   gap: 8px;
 }
+.payment__item.expired {
+  background: crimson;
+}
+.payment__item.expired .payment__title {
+  color: white;
+}
+.payment__item.expired .payment__price {
+  color: white;
+}
+.payment__row {
+  width: 100%;
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+.payment__head {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
 .payment__title {
   flex-grow: 1;
   font-size: 15px;
@@ -418,6 +490,18 @@ body {
   flex-direction: column;
   gap: 24px;
   align-items: center;
+}
+.login__list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.login__grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 .login__title {
   font-size: 20px;
@@ -1633,4 +1717,48 @@ body {
   transform: translateY(-50%);
   transition: 0.3s;
   color: white;
+}
+.counter__icon {
+  position: absolute;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.counter__icon.check i {
+  transition: 0.3s;
+}
+.counter__icon.check i.check {
+  color: #3bff5a;
+  opacity: 1;
+  transition: 0.3s;
+}
+.counter__icon.check i.uncheck {
+  color: crimson;
+  opacity: 0;
+  transition: 0.3s;
+}
+.counter__icon i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 15px;
+  transition: 0.3s;
+}
+.counter__icon i.check {
+  color: #3bff5a;
+  opacity: 0;
+  transition: 0.3s;
+}
+.counter__icon i.uncheck {
+  color: crimson;
+  opacity: 1;
+  transition: 0.3s;
 }

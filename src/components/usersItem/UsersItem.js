@@ -46,7 +46,7 @@ const UsersItem = ({ fullName, username, id, banned, onDelete, home }) => {
                 <div className="users__text">{username}</div>
             </div>
             <div className="users__buttons">
-                {!home ? <Link to={"/house/create?id=" + id}>
+                {!home ? <Link to={"/house/create?id=" + id + "&jkhId=" + id}>
                     <i className="fa-solid fa-house-user"></i>
                 </Link> : null}
                 <button className='dec'

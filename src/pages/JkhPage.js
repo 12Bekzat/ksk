@@ -11,7 +11,7 @@ import ClientsItem from '../components/clientsItem/ClientsItem';
 const JkhPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { getJkhById, getAllEmployee, addEmployeeJkh, getRates } = useMainService();
+    const { getJkhById, getAllEmployee, addEmployeeJkh, getRates, createPayment } = useMainService();
     const [info, setInfo] = useState({})
     const [active, setActive] = useState(0);
     const [employee, setEmployee] = useState([]);
@@ -27,13 +27,13 @@ const JkhPage = () => {
     }, [id])
 
     useEffect(() => {
-        console.log(rates);
-    }, [rates])
+        console.log(employee);
+    }, [employee])
 
     const handleRatesLoad = () => {
         getRates()
             .then(data => {
-                setRates(data.map(item => ({ ...item, meter: 0, removalDate: '' })));
+                setRates(data.map(item => ({ ...item, meter: 0, removalDate: '', check: true })));
             })
             .catch(err => {
                 console.log(err);
@@ -44,6 +44,7 @@ const JkhPage = () => {
         getJkhById(id)
             .then(data => {
                 setInfo(data);
+                setClient(data.clients[0].owner.id);
             })
             .catch(err => {
                 console.log(err);
@@ -53,9 +54,11 @@ const JkhPage = () => {
     const handleEmployeeLoad = () => {
         getAllEmployee()
             .then(data => {
+                console.log("Employee", data);
                 if (data.length > 0) {
                     setEmployee(data);
                     setSelected(data[0].id)
+                    setClient(data[0].id)
                 }
             })
             .catch(err => {
@@ -119,6 +122,11 @@ const JkhPage = () => {
                     <label htmlFor="username">
                         Тариф
                     </label>
+                    <div className={"counter__icon" + (item.check ? " check" : "")}
+                        onClick={() => setRates(rates => rates.map((rt, rtInd) => (rtInd == index ? { ...rt, check: !rt.check } : rt)))}>
+                        <i className="fa-solid fa-circle-check check"></i>
+                        <i className="fa-solid fa-circle-xmark uncheck"></i>
+                    </div>
                 </div>
                 <div className="counter__input">
                     <input autoComplete='off'
@@ -151,6 +159,38 @@ const JkhPage = () => {
             </div>
         ))
     }, [rates]);
+
+    const paymentSend = () => {
+        console.log(rates.filter(rate => (rate.check && (rate.removalDate == '' || rate.meter == 0))).length != 0);
+        console.log(client);
+        if (rates.filter(rate => (rate.check && (rate.removalDate == '' || rate.meter == 0))).length != 0 || client == -1) {
+            setData({ show: true, text: 'Введите корректные информации.', title: 'Ошибка!' });
+            return;
+        }
+
+        const payment = {
+            price: rates.reduce((acc, current) => acc + (current.check ? (current.price * current.meter) : 0), 0),
+            user: {
+                id: client
+            },
+            jkh: {
+                id: info.id
+            },
+            counters: rates.filter(rate => rate.check).map(rate => {
+                return {
+                    meterReadings: rate.meter,
+                    removalDate: rate.removalDate,
+                    rate: rate.id,
+                }
+            })
+        };
+        console.log("payment", payment);
+        createPayment(info.id, client, payment)
+            .then(data => {
+                setData({ show: true, text: 'Квитанция за ком. услуги успешно отправлено.', title: 'Ком. услуги' });
+            })
+            .catch(err => console.log(err));
+    }
 
     function addThousandSeparators(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -235,7 +275,7 @@ const JkhPage = () => {
                                     </div>
                                 </div>
                                 <div className="counter__row">
-                                    <div className="counter__button">Отправить</div>
+                                    <div className="counter__button" onClick={paymentSend}>Отправить</div>
                                 </div>
                             </div>
 

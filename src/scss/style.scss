@@ -34,6 +34,67 @@ body {
     }
 }
 
+.loader {
+    width: 100%;
+    height: 100%;
+    background: #212327;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .lds-facebook,
+    .lds-facebook div {
+        box-sizing: border-box;
+    }
+
+    .lds-facebook {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+
+    .lds-facebook div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: currentColor;
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+        background: #3bff5a;
+    }
+
+    .lds-facebook div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+    }
+
+    .lds-facebook div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+    }
+
+    .lds-facebook div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0s;
+    }
+}
+
+@keyframes lds-facebook {
+    0% {
+        top: 8px;
+        height: 64px;
+    }
+
+    50%,
+    100% {
+        top: 24px;
+        height: 32px;
+    }
+}
+
+
+
 .popup {
     display: flex;
     flex-direction: column;
@@ -422,6 +483,33 @@ $max-size: 1100px;
         display: flex;
         align-items: center;
         gap: 8px;
+
+        &.expired {
+            background: crimson;
+
+            .payment__title {
+                color: white;
+            }
+
+            .payment__price {
+                color: white;
+            }
+        }
+    }
+
+    &__row {
+        width: 100%;
+        display: flex;
+        padding: 8px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    &__head {
+        font-size: 16px;
+        color: white;
+        font-weight: 600;
     }
 
     &__title {
@@ -472,6 +560,20 @@ $max-size: 1100px;
         flex-direction: column;
         gap: 24px;
         align-items: center;
+    }
+
+    &__list {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__grid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
 
     &__title {
@@ -1848,6 +1950,59 @@ $max-size: 1100px;
             transform: translateY(-50%);
             transition: .3s;
             color: white;
+        }
+    }
+
+    &__icon {
+        position: absolute;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        top: 50%;
+        right: 5px;
+        transform: translateY(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &.check {
+            i {
+                transition: .3s;
+
+                &.check {
+                    color: #3bff5a;
+                    opacity: 1;
+                    transition: .3s;
+                }
+
+                &.uncheck {
+                    color: crimson;
+                    opacity: 0;
+                    transition: .3s;
+                }
+            }
+        }
+
+        i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 15px;
+            transition: .3s;
+
+            &.check {
+                color: #3bff5a;
+                opacity: 0;
+                transition: .3s;
+            }
+
+            &.uncheck {
+                color: crimson;
+                opacity: 1;
+                transition: .3s;
+            }
         }
     }
 }

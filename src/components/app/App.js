@@ -16,31 +16,36 @@ import Jkh from '../../pages/Jkh';
 import JkhPage from '../../pages/JkhPage';
 import HouseCreate from '../../pages/HouseCreate';
 import Rate from '../../pages/Rate';
+import Pay from '../../pages/Pay';
+import { LoaderProvider } from '../../providers/LoaderProvider';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <PopupProvider>
-          <Header />
+          <LoaderProvider>
+            <Header />
 
-          <div className="main">
-            <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/user/create' element={<UserCreate />} />
-              <Route path='/manage' element={<Payments />} />
-              <Route path='/profile' element={<Profile />} />
-              <Route path='/news' element={<News />} />
-              <Route path='/house/create' element={<HouseCreate />} />
-              <Route path='/jkh' element={<Jkh />} />
-              <Route path='/rate/create' element={<Rate />} />
-              <Route path='/jkh/:id' element={<JkhPage />} />
-              <Route path='/user/edit/:id' element={<UserEdit />} />
-            </Routes>
-          </div>
+            <div className="main">
+              <Routes>
+                <Route path='/' element={<Home />} />
+                <Route path='/login' element={<Login />} />
+                <Route path='/user/create' element={<UserCreate />} />
+                <Route path='/manage' element={<Payments />} />
+                <Route path='/profile' element={<Profile />} />
+                <Route path='/news' element={<News />} />
+                <Route path='/house/create' element={<HouseCreate />} />
+                <Route path='/jkh' element={<Jkh />} />
+                <Route path='/pay' element={<Pay />} />
+                <Route path='/rate/create' element={<Rate />} />
+                <Route path='/jkh/:id' element={<JkhPage />} />
+                <Route path='/user/edit/:id' element={<UserEdit />} />
+              </Routes>
+            </div>
 
-          <Footer />
+            <Footer />
+          </LoaderProvider>
         </PopupProvider>
       </AuthProvider>
     </Router>

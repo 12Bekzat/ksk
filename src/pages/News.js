@@ -17,7 +17,7 @@ const News = () => {
     const id = searchParams.get('id');
 
     useEffect(() => {
-        if (role.filter(item => item.name === "ROLE_ADMIN").length === 0) {
+        if (role.filter(item => item.name === "ROLE_ADMIN" || item.name === "ROLE_KSK").length === 0) {
             navigate("/");
         }
     }, [])
